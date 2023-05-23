@@ -1,5 +1,5 @@
 {
-  "name": "lowcode",
+  "name": "antv_x6",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,6 +11,9 @@
     "commit": "cz"
   },
   "dependencies": {
+    "@antv/x6": "^2.11.1",
+    "@antv/x6-plugin-history": "^2.0.0",
+    "@antv/x6-plugin-keyboard": "^2.0.0",
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
