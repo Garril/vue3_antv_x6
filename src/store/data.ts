@@ -17,3 +17,10 @@ export const default_data = {
     }
   ]
 }
+export const basic_data = {
+  data: [
+    {
+      name: 'switch'
+    }
+  ]
+}

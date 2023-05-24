@@ -1,7 +1,8 @@
 <template>
   <div id="mainview">
     <ServiceCpn></ServiceCpn>
-    <GrapCpn></GrapCpn>
+    <GrapCpn @curConfig="changeConfig"></GrapCpn>
+    <ConfigCpn :curConfig="curConfigNode"></ConfigCpn>
   </div>
 </template>
 
@@ -9,17 +10,28 @@
 import { defineComponent, ref, provide, reactive } from 'vue'
 import GrapCpn from './components/GrapCpn.vue'
 import ServiceCpn from './components/ServiceCpn.vue'
-import { ServiceArrType } from './components/ServiceType'
+import ConfigCpn from './components/ConfigCpn.vue'
+import { ServiceArrType, ServiceType } from './components/ServiceType'
 
 export default defineComponent({
   components: {
     GrapCpn,
-    ServiceCpn
+    ServiceCpn,
+    ConfigCpn
   },
   setup() {
     const curChoose = ref<ServiceArrType>([])
     provide('curChoose', curChoose)
-    return {}
+    const globalMap = ref(new Map())
+    provide('globalMap', globalMap)
+    const curConfigNode = ref()
+    const changeConfig = (item: any) => {
+      curConfigNode.value = item
+    }
+    return {
+      changeConfig,
+      curConfigNode
+    }
   }
 })
 </script>

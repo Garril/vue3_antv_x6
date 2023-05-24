@@ -14,7 +14,7 @@ import { ServiceType, ServiceArrType } from './ServiceType'
 // 创建实例
 
 export default defineComponent({
-  setup() {
+  setup(props, { emit }) {
     const data = {
       // // 节点
       // nodes: [
@@ -46,6 +46,9 @@ export default defineComponent({
     const grapWrapRef = ref()
     const containerRef = ref()
     const graph = ref()
+    const curChoose = inject('curChoose') as Ref<ServiceArrType>
+    const curItem = ref()
+    const globalMap = inject('globalMap') as Ref<Map<string, Array<any>>>
     const drawGraph = () => {
       const options = {
         container: containerRef.value,
@@ -75,6 +78,12 @@ export default defineComponent({
       graph.value.bindKey('ctrl+z', () => {
         onUndo()
       })
+      graph.value.on('node:click', ({ node }: any) => {
+        emit('curConfig', node)
+      })
+      graph.value.on('cell:added', ({ cell }: any) => {
+        globalMap.value.set(cell.id, [curItem.value, cell])
+      })
       graph.value.fromJSON(data)
     }
     const initGraph = () => {
@@ -90,8 +99,6 @@ export default defineComponent({
         drawGraph()
       }
     }
-    const curChoose = inject('curChoose') as Ref<ServiceArrType>
-    const curItem = ref()
     const handleDrop = () => {
       curItem.value = curChoose.value[0]
       const node_options = {
@@ -170,7 +177,8 @@ export default defineComponent({
               }
             }
           ]
-        }
+        },
+        tools: ['button-remove']
       }
       node_options.label = curItem.value.name
       const input_output_arr = [] as any
@@ -179,7 +187,7 @@ export default defineComponent({
           id: 'port-in-' + index,
           group: 'in',
           attrs: {
-            text: { text: 'in - ' + keyName }
+            text: { text: 'in-' + keyName }
           }
         })
       })
@@ -188,13 +196,13 @@ export default defineComponent({
           id: 'port-out-' + index,
           group: 'out',
           attrs: {
-            text: { text: 'out - ' + keyName }
+            text: { text: 'out-' + keyName }
           }
         })
       })
       node_options.ports.items = input_output_arr
       graph.value.addNode(node_options)
-      console.log(graph.value.toJSON())
+      // console.log(graph.value.toJSON())
     }
     const onUndo = () => {
       const pluginArr = Array.from(graph.value.installedPlugins)
