@@ -2,7 +2,7 @@
   <div id="mainview">
     <ServiceCpn></ServiceCpn>
     <GrapCpn @curConfig="changeConfig"></GrapCpn>
-    <ConfigCpn :curConfig="curConfigNode"></ConfigCpn>
+    <!-- <ConfigCpn :curConfig="curConfigNode"></ConfigCpn> -->
   </div>
 </template>
 
@@ -16,8 +16,8 @@ import { ServiceArrType, ServiceType } from './components/ServiceType'
 export default defineComponent({
   components: {
     GrapCpn,
-    ServiceCpn,
-    ConfigCpn
+    ServiceCpn
+    // ConfigCpn
   },
   setup() {
     const curChoose = ref<ServiceArrType>([])

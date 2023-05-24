@@ -21,6 +21,9 @@ export const basic_data = {
   data: [
     {
       name: 'switch'
+    },
+    {
+      name: 'start'
     }
   ]
 }

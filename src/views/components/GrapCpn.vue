@@ -1,6 +1,24 @@
 <template>
   <div id="grap_cpn" ref="grapWrapRef" @drop="handleDrop" @dragover.prevent>
     <div id="container" ref="containerRef"></div>
+    <div id="config_container" v-if="isOpen">
+      <div class="input_btn">
+        <label for="input_num">input的数量</label>
+        <input id="input_num" type="number" v-model="inputNum" />
+      </div>
+      <div class="input_btn">
+        <label for="output_num">output的数量</label>
+        <input id="output_num" type="number" v-model="outputNum" />
+      </div>
+      <el-button class="btn" @click="finishNum">确认</el-button>
+      <ConfigForm
+        v-if="isFormOpen"
+        :outputNum="outputNum"
+        :inputNum="inputNum"
+        @onSubmit="finishConfig"
+        @onCancel="quitConfig"
+      ></ConfigForm>
+    </div>
   </div>
 </template>
 
@@ -10,10 +28,13 @@ import { defineComponent, inject, onMounted, ref, Ref } from 'vue'
 import { Graph, Shape } from '@antv/x6'
 import { History } from '@antv/x6-plugin-history/lib/index'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
+import ConfigForm from './ConfigForm.vue'
 import { ServiceType, ServiceArrType } from './ServiceType'
+import { fa } from 'element-plus/es/locale'
 // 创建实例
 
 export default defineComponent({
+  components: { ConfigForm },
   setup(props, { emit }) {
     const data = {
       // // 节点
@@ -49,6 +70,14 @@ export default defineComponent({
     const curChoose = inject('curChoose') as Ref<ServiceArrType>
     const curItem = ref()
     const globalMap = inject('globalMap') as Ref<Map<string, Array<any>>>
+    const isOpen = ref(false)
+    const isFormOpen = ref(false)
+    const finishNum = () => {
+      isFormOpen.value = true
+    }
+    const inputNum = ref()
+    const outputNum = ref()
+    const curNodeInfo = ref()
     const drawGraph = () => {
       const options = {
         container: containerRef.value,
@@ -84,6 +113,7 @@ export default defineComponent({
       graph.value.on('cell:added', ({ cell }: any) => {
         globalMap.value.set(cell.id, [curItem.value, cell])
       })
+      graph.value.centerContent()
       graph.value.fromJSON(data)
     }
     const initGraph = () => {
@@ -201,7 +231,12 @@ export default defineComponent({
         })
       })
       node_options.ports.items = input_output_arr
-      graph.value.addNode(node_options)
+      if (curItem.value.isConfig) {
+        isOpen.value = true
+        curNodeInfo.value = node_options
+      } else {
+        graph.value.addNode(node_options)
+      }
       // console.log(graph.value.toJSON())
     }
     const onUndo = () => {
@@ -215,6 +250,36 @@ export default defineComponent({
         console.log('没找到history插件')
       }
     }
+    const finishConfig = (info: any) => {
+      console.log(info)
+      isFormOpen.value = false
+      isOpen.value = false
+      const input_output_arr = [] as any
+      for (let i = 0; i < info.inputNum; i++) {
+        input_output_arr.push({
+          id: 'port-in-' + (i + 1),
+          group: 'in',
+          attrs: {
+            text: { text: 'in-' + info.data['input' + (i + 1)] }
+          }
+        })
+      }
+      for (let i = 0; i < info.outputNum; i++) {
+        input_output_arr.push({
+          id: 'port-out-' + (i + 1),
+          group: 'out',
+          attrs: {
+            text: { text: 'out-' + info.data['output' + (i + 1)] }
+          }
+        })
+      }
+      curNodeInfo.value.ports.items = input_output_arr
+      graph.value.addNode(curNodeInfo.value)
+    }
+    const quitConfig = () => {
+      isFormOpen.value = false
+      isOpen.value = false
+    }
     onMounted(() => {
       initGraph()
     })
@@ -222,7 +287,14 @@ export default defineComponent({
       containerRef,
       grapWrapRef,
       handleDrop,
-      onUndo
+      onUndo,
+      isOpen,
+      inputNum,
+      outputNum,
+      finishNum,
+      isFormOpen,
+      finishConfig,
+      quitConfig
     }
   }
 })
@@ -232,5 +304,29 @@ export default defineComponent({
 #grap_cpn {
   flex: 1;
   height: 100vh !important;
+}
+#config_container {
+  position: absolute;
+  top: 10%;
+  left: 40%;
+  z-index: 100;
+  background-color: #fff;
+  padding: 20px 40px;
+}
+#config_container .btn {
+  margin: 10px auto;
+}
+#config_container .input_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 4px 0 0 0;
+  margin: 10px 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+#config_container .input_btn label {
+  padding: 0 10px;
 }
 </style>

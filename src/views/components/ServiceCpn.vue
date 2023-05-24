@@ -22,6 +22,10 @@
         {{ item.name }}
       </div>
     </div>
+    <h3>生成事件流</h3>
+    <div id="createworkflow">
+      <el-button @click="createworkflow">生成</el-button>
+    </div>
   </div>
 </template>
 
@@ -52,7 +56,10 @@ export default defineComponent({
       }
       curChoose.value.push(item)
     }
-    return { resJson, handleDrag, basicJson }
+    const createworkflow = () => {
+      console.log('first')
+    }
+    return { resJson, handleDrag, basicJson, createworkflow }
   }
 })
 </script>
@@ -88,5 +95,8 @@ h3 {
   padding: 10px 0;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
+}
+#createworkflow .el-button {
+  margin: 20px 0;
 }
 </style>
