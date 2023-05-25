@@ -16,6 +16,12 @@
         ></el-input>
       </el-form-item>
     </template>
+    <el-form-item label="name">
+      <el-input
+        placeholder="请输入事件流/switch的名字"
+        v-model="form.name"
+      ></el-input>
+    </el-form-item>
 
     <el-form-item>
       <el-button type="primary" @click="onSubmit">Create</el-button>
@@ -55,6 +61,7 @@ export default defineComponent({
     for (let i = 0; i < outputNum.value; i++) {
       obj['output' + i] = ''
     }
+    obj.name = ''
     const form = reactive(obj)
     const onSubmit = () => {
       emit('onSubmit', {

@@ -43,7 +43,7 @@ import { default_data, basic_data } from '../../store/data'
 
 export default defineComponent({
   components: {},
-  setup(props) {
+  setup(props, { emit }) {
     const resJson = reactive(default_data)
     const basicJson = reactive(basic_data)
     const curChoose = inject('curChoose') as Ref<ServiceArrType>
@@ -57,7 +57,7 @@ export default defineComponent({
       curChoose.value.push(item)
     }
     const createworkflow = () => {
-      console.log('first')
+      emit('createWorkFlow')
     }
     return { resJson, handleDrag, basicJson, createworkflow }
   }

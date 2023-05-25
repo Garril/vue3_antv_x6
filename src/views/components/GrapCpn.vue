@@ -30,7 +30,6 @@ import { History } from '@antv/x6-plugin-history/lib/index'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import ConfigForm from './ConfigForm.vue'
 import { ServiceType, ServiceArrType } from './ServiceType'
-import { fa } from 'element-plus/es/locale'
 // 创建实例
 
 export default defineComponent({
@@ -237,7 +236,6 @@ export default defineComponent({
       } else {
         graph.value.addNode(node_options)
       }
-      // console.log(graph.value.toJSON())
     }
     const onUndo = () => {
       const pluginArr = Array.from(graph.value.installedPlugins)
@@ -273,6 +271,7 @@ export default defineComponent({
           }
         })
       }
+      curItem.value.configName = info.data.name
       curNodeInfo.value.ports.items = input_output_arr
       graph.value.addNode(curNodeInfo.value)
     }
@@ -294,7 +293,8 @@ export default defineComponent({
       finishNum,
       isFormOpen,
       finishConfig,
-      quitConfig
+      quitConfig,
+      graph
     }
   }
 })

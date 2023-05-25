@@ -1,7 +1,7 @@
 <template>
   <div id="mainview">
-    <ServiceCpn></ServiceCpn>
-    <GrapCpn @curConfig="changeConfig"></GrapCpn>
+    <ServiceCpn @createWorkFlow="startCreateWF"></ServiceCpn>
+    <GrapCpn @curConfig="changeConfig" ref="graphRef"></GrapCpn>
     <!-- <ConfigCpn :curConfig="curConfigNode"></ConfigCpn> -->
   </div>
 </template>
@@ -12,7 +12,7 @@ import GrapCpn from './components/GrapCpn.vue'
 import ServiceCpn from './components/ServiceCpn.vue'
 import ConfigCpn from './components/ConfigCpn.vue'
 import { ServiceArrType, ServiceType } from './components/ServiceType'
-
+import { formatJson } from '../utils/format'
 export default defineComponent({
   components: {
     GrapCpn,
@@ -22,15 +22,22 @@ export default defineComponent({
   setup() {
     const curChoose = ref<ServiceArrType>([])
     provide('curChoose', curChoose)
-    const globalMap = ref(new Map())
+    const globalMap = ref(new Map<string, Array<any>>())
     provide('globalMap', globalMap)
     const curConfigNode = ref()
+    const graphRef = ref()
     const changeConfig = (item: any) => {
       curConfigNode.value = item
     }
+
+    const startCreateWF = () => {
+      formatJson(graphRef.value.graph.toJSON().cells, globalMap.value)
+    }
     return {
       changeConfig,
-      curConfigNode
+      curConfigNode,
+      startCreateWF,
+      graphRef
     }
   }
 })
