@@ -25,11 +25,12 @@
 <script lang="ts">
 import { defineComponent, inject, onMounted, ref, Ref } from 'vue'
 // 引入
-import { Graph, Shape } from '@antv/x6'
+import { Graph, Shape, Color } from '@antv/x6'
 import { History } from '@antv/x6-plugin-history/lib/index'
 import { Keyboard } from '@antv/x6-plugin-keyboard'
 import ConfigForm from './ConfigForm.vue'
 import { ServiceType, ServiceArrType } from './ServiceType'
+import { line } from '@antv/x6/lib/registry/port-layout/line'
 // 创建实例
 
 export default defineComponent({
@@ -69,6 +70,7 @@ export default defineComponent({
     const curChoose = inject('curChoose') as Ref<ServiceArrType>
     const curItem = ref()
     const globalMap = inject('globalMap') as Ref<Map<string, Array<any>>>
+    const lineMap = inject('lineMap') as Ref<Map<string, unknown>>
     const isOpen = ref(false)
     const isFormOpen = ref(false)
     const finishNum = () => {
@@ -109,6 +111,13 @@ export default defineComponent({
       graph.value.on('node:click', ({ node }: any) => {
         emit('curConfig', node)
       })
+      graph.value.on('edge:click', ({ edge }: any) => {
+        if (!lineMap.value.has(edge.id)) {
+          lineMap.value.set(edge.id, edge)
+        }
+        console.log('you click edge: ', edge.id, edge, lineMap)
+        emit('curConfig', edge)
+      })
       graph.value.on('cell:added', ({ cell }: any) => {
         globalMap.value.set(cell.id, [curItem.value, cell])
       })
@@ -145,10 +154,10 @@ export default defineComponent({
               },
               attrs: {
                 circle: {
-                  r: 4,
+                  r: 8,
                   magnet: true,
                   stroke: '#31d0c6',
-                  strokeWidth: 2,
+                  strokeWidth: 4,
                   fill: '#fff'
                 }
               }
@@ -160,10 +169,10 @@ export default defineComponent({
               },
               attrs: {
                 circle: {
-                  r: 4,
+                  r: 8,
                   magnet: true,
                   stroke: '#31d0c6',
-                  strokeWidth: 2,
+                  strokeWidth: 4,
                   fill: '#fff'
                 }
               }
@@ -230,7 +239,7 @@ export default defineComponent({
         })
       })
       node_options.ports.items = input_output_arr
-      if (curItem.value.isConfig) {
+      if (curItem.value.isConfig && curItem.value.name != 'final') {
         isOpen.value = true
         curNodeInfo.value = node_options
       } else {

@@ -3,26 +3,8 @@
     <h3>配置界面</h3>
     <div id="config_container">
       <div id="control_container" v-if="openBtns">
-        <div class="input_btn">
-          <label for="addinput">添加input字段名</label>
-          <input id="addinput" type="text" v-model="addInputName" />
-          <button class="btn" @click="addNodePort(true)">addPort</button>
-        </div>
-        <div class="input_btn">
-          <label for="removeinput">删除input字段名</label>
-          <input id="removeinput" type="text" v-model="removeInputName" />
-          <button class="btn" @click="removeNodePort(true)">removePort</button>
-        </div>
-        <div class="input_btn">
-          <label for="addoutput">添加output字段名</label>
-          <input id="addoutput" type="text" v-model="addOutputName" />
-          <button class="btn" @click="addNodePort(false)">addPort</button>
-        </div>
-        <div class="input_btn">
-          <label for="removeoutput">删除output字段名</label>
-          <input id="removeoutput" type="text" v-model="removeOutputName" />
-          <button class="btn" @click="removeNodePort(false)">removePort</button>
-        </div>
+        <el-button @click="changeLine(true)">设置为流程线</el-button>
+        <el-button @click="changeLine(false)">设置为数据线</el-button>
       </div>
     </div>
   </div>
@@ -52,81 +34,34 @@ export default defineComponent({
     const openBtns = ref(false)
     const curJsonInfo = ref()
     const curCellInfo = ref()
-    const addInputName = ref()
-    const addOutputName = ref()
-    const removeInputName = ref()
-    const removeOutputName = ref()
     const globalMap = inject('globalMap') as Ref<Map<string, Array<any>>>
-    const judgeRender = () => {
-      if (curJsonInfo.value.isConfig) {
-        // configList.value.push()
-        openBtns.value = true
-      } else {
-        openBtns.value = false
-      }
-    }
-    const addNodePort = (sign: boolean) => {
-      console.log('add')
-      const ports = curCellInfo.value.getPorts()
-      console.log(ports)
-      const options = {
-        group: 'top',
-        position: 'left',
-        label: {
-          position: 'left'
-        },
-        attrs: {
-          circle: {
-            r: 4,
-            magnet: true,
-            stroke: '#31d0c6',
-            strokeWidth: 2,
-            fill: '#fff'
-          },
-          text: {
-            text: `${ports.length + 1}`
-          }
-        }
-      }
-      if (sign) {
-        // 添加input连接点
-      } else {
-        // 添加output连接点
-      }
-      curCellInfo.value.addPort(options)
-    }
-    const removeNodePort = (sign: boolean) => {
-      console.log('remove')
-      const ports = curCellInfo.value.getPorts()
-      if (sign) {
-        // 删除input连接点
-      } else {
-        // 删除output连接点
-      }
-      if (ports.length) {
-        curCellInfo.value.removePortAt(ports.length - 1)
-      }
-    }
+    const lineMap = inject('lineMap') as Ref<Map<string, unknown>>
     watch(
       () => props.curConfig,
       () => {
-        const id = props?.curConfig?.id
-        const infoArr = globalMap.value.get(id)
-        if (infoArr) {
-          curJsonInfo.value = infoArr[0]
-          curCellInfo.value = infoArr[1]
-          judgeRender()
+        if (props?.curConfig?.port) {
+          const id = props?.curConfig?.id
+          const infoArr = globalMap.value.get(id)
+          if (infoArr) {
+            curJsonInfo.value = infoArr[0]
+            curCellInfo.value = infoArr[1]
+          }
+          openBtns.value = false
+        } else {
+          openBtns.value = true
         }
       }
     )
+    const changeLine = (sign: boolean) => {
+      if (sign) {
+        emit('changeLineColor')
+      } else {
+        emit('changeNormalLine')
+      }
+    }
     return {
       openBtns,
-      addNodePort,
-      removeNodePort,
-      addInputName,
-      addOutputName,
-      removeInputName,
-      removeOutputName
+      changeLine
     }
   }
 })
@@ -172,5 +107,8 @@ h3 {
 }
 #control_container .input_btn input {
   width: 130px;
+}
+#control_container button {
+  margin: 20px 10px;
 }
 </style>

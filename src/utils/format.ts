@@ -3,32 +3,38 @@ export function formatJson(
   globalMap: Map<string, Array<any>>
 ) {
   let startNode: any
-  const lineArr: Array<any> = []
+  let finalNode: any
+  const lineDataArr: Array<any> = []
+  const lineLogicArr: Array<any> = []
   const serviceArr: Array<any> = []
-  // 将所有节点，按照起始节点、线、微服务 进行分类
+  // 将所有节点，按照起始节点、终点节点、线(逻辑和数据)、微服务 进行分类
   resJsonArr.forEach((item: any, index: string) => {
-    if (!item.attrs) {
-      lineArr.push(item)
+    if (!item?.attrs || item?.attrs?.line) {
+      if (
+        item.attrs &&
+        item.attrs.line &&
+        item.attrs.line.stroke == '#0000ff'
+      ) {
+        lineLogicArr.push(item)
+      } else {
+        lineDataArr.push(item)
+      }
     } else {
       if (item.attrs.text.text == 'start') {
         startNode = item
+      } else if (item.attrs.text.text === 'final') {
+        finalNode = item
       } else {
         serviceArr.push(item)
       }
     }
   })
-  // 从start开始，先找线
-  const firstLineArr = lineArr.map((item) => {
-    if ((item.source.cell = startNode.id)) {
-      return item
-    }
-  })
-  // 拿到所有与首节点相连的节点
-  const firstNodeArr: Array<any> = []
-  firstLineArr.forEach((item) => {
-    firstNodeArr.push(findServiceById(item.target.cell, globalMap))
+  // 先生成逻辑模板
+  const firstLine = lineLogicArr.find((line: any) => {
+    return startNode.id == line.source.cell
   })
 }
+
 const findServiceById = (id: string, globalMap: Map<string, Array<any>>) => {
   const t = globalMap.get(id)
   return t ? t[0] : null

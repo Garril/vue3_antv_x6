@@ -24,6 +24,10 @@ export const basic_data = {
     },
     {
       name: 'start'
+    },
+    {
+      name: 'final',
+      inputKeys: ['result']
     }
   ]
 }
