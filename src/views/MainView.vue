@@ -4,6 +4,7 @@
     <GrapCpn @curConfig="changeConfig" ref="graphRef"></GrapCpn>
     <ConfigCpn
       :curConfig="curConfigNode"
+      @changeAllLineColor="changeAllLineColor"
       @changeLineColor="changeLineColor"
       @changeNormalLine="changeNormalLine"
     ></ConfigCpn>
@@ -48,6 +49,13 @@ export default defineComponent({
       const color = Color.named.blue
       target.attr('line/stroke', color)
     }
+    const changeAllLineColor = () => {
+      const edges = graphRef.value.graph.getEdges()
+      edges.forEach((edge: any) => {
+        const color = Color.named.blue
+        edge.attr('line/stroke', color)
+      })
+    }
     const changeNormalLine = () => {
       const edges = graphRef.value.graph.getEdges()
       const target = edges.find((edge: any) => {
@@ -67,7 +75,8 @@ export default defineComponent({
       startCreateWF,
       graphRef,
       changeLineColor,
-      changeNormalLine
+      changeNormalLine,
+      changeAllLineColor
     }
   }
 })

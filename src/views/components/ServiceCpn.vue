@@ -11,7 +11,7 @@
         {{ item.name }}
       </div>
     </div>
-    <h3>逻辑节点</h3>
+    <h3>基础节点</h3>
     <div id="logic_container">
       <div
         v-for="(item, index) in basicJson.data"

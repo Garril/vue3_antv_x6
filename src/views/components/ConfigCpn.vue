@@ -3,8 +3,14 @@
     <h3>配置界面</h3>
     <div id="config_container">
       <div id="control_container" v-if="openBtns">
+        <el-button @click="changeLine(true, true)">全设为流程线</el-button>
         <el-button @click="changeLine(true)">设置为流程线</el-button>
         <el-button @click="changeLine(false)">设置为数据线</el-button>
+      </div>
+      <div id="input_container" v-if="openInput">
+        <h2>请输入JS表达式</h2>
+        <el-input v-model="input" :placeholder="egStr"></el-input>
+        <el-button @click="changeExpress">确定</el-button>
       </div>
     </div>
   </div>
@@ -32,36 +38,60 @@ export default defineComponent({
   },
   setup(props, { emit }) {
     const openBtns = ref(false)
+    const openInput = ref(false)
     const curJsonInfo = ref()
+    const input = ref('')
+    const egStr = ref("eg: $.type == 'gray' ? 'gray' : 'beauty'")
     const curCellInfo = ref()
     const globalMap = inject('globalMap') as Ref<Map<string, Array<any>>>
     const lineMap = inject('lineMap') as Ref<Map<string, unknown>>
     watch(
       () => props.curConfig,
       () => {
+        const id = props?.curConfig?.id
+        const infoArr = globalMap.value.get(id)
         if (props?.curConfig?.port) {
-          const id = props?.curConfig?.id
-          const infoArr = globalMap.value.get(id)
           if (infoArr) {
             curJsonInfo.value = infoArr[0]
             curCellInfo.value = infoArr[1]
           }
           openBtns.value = false
+          if (infoArr && infoArr[0]?.name == 'switch') {
+            openInput.value = true
+          } else {
+            openInput.value = false
+          }
         } else {
           openBtns.value = true
         }
       }
     )
-    const changeLine = (sign: boolean) => {
+    const changeLine = (sign: boolean, all?: boolean) => {
+      if (all) {
+        emit('changeAllLineColor')
+        return
+      }
       if (sign) {
         emit('changeLineColor')
       } else {
         emit('changeNormalLine')
       }
     }
+    const changeExpress = () => {
+      const id = props?.curConfig?.id
+      const infoArr = globalMap.value.get(id)
+      if (infoArr && infoArr[0]) {
+        infoArr[0].express = input.value
+        globalMap.value.set(id, [infoArr[0], infoArr[1]])
+      }
+    }
     return {
       openBtns,
-      changeLine
+      changeLine,
+      openInput,
+      input,
+      egStr,
+      changeExpress
     }
   }
 })
