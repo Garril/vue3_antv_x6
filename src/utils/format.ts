@@ -1,3 +1,110 @@
+const findServiceById = (id: string, globalMap: Map<string, Array<any>>) => {
+  const t = globalMap.get(id)
+  return t ? t[0] : null
+}
+
+const serviceTemplate = (
+  serviceBasic: any,
+  serviceDeatil: any,
+  lineDataArr: any
+) => {
+  const str1 = `{
+    "name": ${serviceBasic.name},
+    "taskReferenceName": ${serviceBasic.name},
+  `
+  //   let str2 = ''
+  //   serviceBasic.inputKeys.map((item: any, index: number) => {})
+  //   return `
+  //     "inputParameters": {
+  //         ${inputKeysName}
+  //     },
+  //     "type": "SIMPLE"
+  // }`
+}
+
+const switchTemplate = (
+  serviceBasic: any,
+  serviceDeatil: any,
+  lineDataArr: any
+) => {
+  console.log('first')
+}
+
+const workFlowTemplate = (
+  logicTemplate: any,
+  globalMap: Map<string, Array<any>>,
+  lineDataArr: any
+) => {
+  console.log(lineDataArr)
+  let resStr = ''
+  const str1 = `{
+    "name": ${logicTemplate.workflow},
+    "description": "deal my img",
+    "version": 1,
+    "schemaVersion": 2,
+    "ownerEmail": "CoderGarril@outlook.com",
+  `
+  const temp = `"tasks": [
+    {
+        "name": "imgService",
+        "taskReferenceName": "get_img",
+        "inputParameters": {
+            "name": "\${workflow.input.name}",
+            "type": "\${workflow.input.type}"
+        },
+        "type": "SIMPLE"
+    },
+    {
+        "name": "switch_task",
+        "taskReferenceName": "choose_methods",
+        "inputParameters": {
+            "type": "\${workflow.input.type}"
+        },
+        "type": "SWITCH",
+        "evaluatorType": "javascript",
+        "expression": "$.type == 'gray' ? 'gray' : 'beauty'",
+        "decisionCases": {
+            "gray": [
+                {
+                    "name": "grayImg",
+                    "taskReferenceName": "gray_img",
+                    "inputParameters": {
+                        "inputData": "\${get_img.output.responseData}"
+                    },
+                    "type": "SIMPLE"
+                }
+            ],
+            "beauty": [
+                {
+                    "name": "beautyImg",
+                    "taskReferenceName": "beauty_img",
+                    "inputParameters": {
+                        "inputData": "\${get_img.output.responseData}"
+                    },
+                    "type": "SIMPLE"
+                }
+            ]
+        }
+    }
+]
+}`
+  logicTemplate.task.forEach((item: any) => {
+    const infoArr = globalMap.get(item.service)
+    if (item.isConfig && item.type == 'switch') {
+      if (infoArr && infoArr[0] && infoArr[1]) {
+        // switchTemplate(infoArr[0], infoArr[1])
+      }
+    } else {
+      if ((infoArr && infoArr[0] && infoArr[1], lineDataArr)) {
+        // serviceTemplate(infoArr[0], infoArr[1], lineDataArr)
+      }
+    }
+  })
+  const str2 = ``
+  resStr += str1
+  return resStr
+}
+
 /*
     {
       workflow:xxx,
@@ -205,77 +312,6 @@ export function formatJson(
   } */
 
   console.log(logicTemplate)
-}
-
-const findServiceById = (id: string, globalMap: Map<string, Array<any>>) => {
-  const t = globalMap.get(id)
-  return t ? t[0] : null
-}
-
-/* const workFlowTemplate = (configName: string, input) => {
-  let resStr = ''
-  const str1 = `{
-    "name": ${configName},
-    "description": "deal my img",
-    "version": 1,
-    "schemaVersion": 2,
-    "ownerEmail": "CoderGarril@outlook.com",
-    "tasks": [
-        {
-            "name": "imgService",
-            "taskReferenceName": "get_img",
-            "inputParameters": {
-                "name": "\${workflow.input.name}",
-                "type": "\${workflow.input.type}"
-            },
-            "type": "SIMPLE"
-        },
-        {
-            "name": "switch_task",
-            "taskReferenceName": "choose_methods",
-            "inputParameters": {
-                "type": "\${workflow.input.type}"
-            },
-            "type": "SWITCH",
-            "evaluatorType": "javascript",
-            "expression": "$.type == 'gray' ? 'gray' : 'beauty'",
-            "decisionCases": {
-                "gray": [
-                    {
-                        "name": "grayImg",
-                        "taskReferenceName": "gray_img",
-                        "inputParameters": {
-                            "inputData": "\${get_img.output.responseData}"
-                        },
-                        "type": "SIMPLE"
-                    }
-                ],
-                "beauty": [
-                    {
-                        "name": "beautyImg",
-                        "taskReferenceName": "beauty_img",
-                        "inputParameters": {
-                            "inputData": "\${get_img.output.responseData}"
-                        },
-                        "type": "SIMPLE"
-                    }
-                ]
-            }
-        }
-    ]
-  }
-
-  `
-  return resStr
-} */
-
-const serviceTemplate = (serviceName: string, inputKeysName: string) => {
-  return `                  {
-    "name": ${serviceName},
-    "taskReferenceName": ${serviceName},
-    "inputParameters": {
-        ${inputKeysName}
-    },
-    "type": "SIMPLE"
-}`
+  // 根据logicTemplate去生成json
+  workFlowTemplate(logicTemplate, globalMap, lineDataArr)
 }
